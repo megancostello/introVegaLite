@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Vega-Lite COVID-19 Graphs</title>
+    <meta charset="utf-8" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+
+    <style media="screen">
+      /* Add space between Vega-Embed links  */
+      .vega-actions a {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>COVID-19 Vega-Lite Visualization</h1>
+    <!-- Container for the visualization -->
+    <div id="vis"></div>
+
+    <script>
+      // Assign the specification to a local variable vlSpec.
+      var vlSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "https://raw.githubusercontent.com/bcviscourse/datasets/master/lab9-covidtracking.csv"},
+  "vconcat": [
+    {
+      "width":600,
+      "height":175,
+      "title": "Comparison of Total COVID-19 Deaths to Total COVID-19 Positive Cases per State",
+     "mark": {"type": "point", "point": true},
+     "params": [{
+      "name":"brush",
+      "select": {"type": "interval", "encodings": ["x"]}
+    }],
+  "encoding": {
+    "x": {"field": "positive", "type": "quantitative", "scale": {"zero": false}, "title":"Positive Cases of COVID-19"},
+    "y": {"field": "death", "type": "quantitative",     "scale": {"zero": false}, "title":"Deaths from Cases of COVID-19"},
+    "color": {
+      "condition": {"param": "brush", "field": "dataQualityGrade", "type": "nominal"},
+      "value": "grey"
+    },
+    "tooltip": {"field": "state", "type":"nominal"}
+  }
+    },{
+     "repeat": ["hospitalizedCumulative", "recovered"],
+      "columns": 1,
+      "spec":{
+            "height":100,
+            "width":600,
+            "mark": "bar",
+            "transform": [{
+              "filter":{"param":"brush"}
+            }],
+          "encoding": {
+            "x": {"field": "state", "type": "nominal", "title": "State"},
+            "y": {"field": {"repeat":"repeat"}, "type":   "quantitative"},
+            "tooltip": {"field": {"repeat":"repeat"}, "type": "quantitative"}
+      }
+    }
+    }
+  ]
+  
+};
+
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis', vlSpec);
+    </script>
+  </body>
+</html>
